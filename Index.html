@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pookalam Studio — Onam Flower Designer</title>
+<style>
+:root{--purple:#702b8a;--gold:#f5b51b;--cream:#fff9ea;--ink:#3d2418}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at 10% 10%,#fff1bd,transparent 28%),var(--cream)}
+header{padding:18px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ead9b0;background:#fffdf6}
+.logo{font-family:Georgia,serif;font-style:italic;font-size:clamp(30px,5vw,52px);font-weight:800;color:#5b1738}.logo small{display:block;font:600 15px system-ui;color:#3d2418;margin-top:-5px}
+.top{display:flex;gap:8px;flex-wrap:wrap}.btn{padding:11px 15px;border:1px solid #e4d2ad;border-radius:12px;background:white;font-weight:700;color:var(--ink);cursor:pointer}.btn:hover{box-shadow:0 5px 14px #5b17381c}.download{background:var(--purple);color:white;border-color:var(--purple)}
+.layout{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 111px)}
+aside{padding:18px;background:#fffdf7;border-right:1px solid #ead9b0;overflow:auto}.sec{margin-bottom:20px}.title{font-weight:800;margin-bottom:10px;display:flex;gap:8px;align-items:center}.num{background:var(--purple);color:white;width:25px;height:25px;border-radius:50%;display:grid;place-items:center;font-size:13px}
+.flowers{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 7px}.flower{background:none;border:0;padding:0;cursor:pointer;text-align:center;font-size:11px;color:#513322}.flower i{display:block;width:54px;height:54px;margin:auto;border-radius:50%;box-shadow:0 0 0 2px white,0 0 0 3px #e1d0aa;background:radial-gradient(circle,#fff 0 10%,transparent 11%),repeating-conic-gradient(from 0deg,var(--c) 0 9deg,#fff 9deg 13deg);}.flower.active i{box-shadow:0 0 0 3px var(--purple),0 0 0 5px white}
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.tool{padding:10px 3px;background:white;border:1px solid #e2d3b7;border-radius:10px;cursor:pointer;font-size:12px;font-weight:700}.tool.active{background:#f1e3f5;border-color:#a878b7}.range{width:100%}.colors{display:flex;gap:9px;flex-wrap:wrap}.swatch{width:30px;height:30px;border-radius:50%;border:3px solid white;box-shadow:0 0 0 1px #bca983;cursor:pointer}
+.tip{background:#fff2c7;border-radius:12px;padding:11px;font-size:13px;line-height:1.4}
+.workspace{padding:22px;display:flex;justify-content:center;align-items:center;min-width:0}.board{position:relative;width:min(78vw,760px);aspect-ratio:1;border-radius:28px;padding:18px;background:linear-gradient(135deg,#ead7b4,#fff6dd);box-shadow:0 15px 40px #5b381b22}.board:before{content:"";position:absolute;inset:8px;border:2px dashed #d2b56d;border-radius:22px;pointer-events:none}canvas{position:relative;width:100%;height:100%;display:block;border-radius:50%;background:#fffdf5}
+.controls{position:absolute;right:28px;top:28px;background:#fffdf7eF;padding:12px;border-radius:15px;box-shadow:0 5px 20px #4d321b25;width:145px}.controls label{display:block;font-size:12px;font-weight:700;margin:7px 0}.mini{height:8px;width:100%}
+@media(max-width:800px){header{align-items:flex-start;gap:12px;flex-direction:column}.layout{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid #ead9b0}.workspace{padding:10px}.board{width:min(96vw,680px)}.controls{display:none}}
+</style>
+</head>
+<body>
+<header><div class="logo">Pookalam Studio <small>🌼 Design your own Kerala-style pookalam 🌼</small></div>
+<div class="top"><button class="btn" onclick="template()">🌸 Template</button><button class="btn" onclick="surprise()">🎁 Surprise Me</button><button class="btn" onclick="undo()">↶ Undo</button><button class="btn" onclick="redo()">↷ Redo</button><button class="btn" onclick="clearAll()">🗑 Clear</button><button class="btn download" onclick="save()">⇩ Download</button></div></header>
+<div class="layout"><aside>
+<div class="sec"><div class="title"><span class="num">1</span>Choose Flowers</div><div class="flowers" id="flowers"></div></div>
+<div class="sec"><div class="title"><span class="num">2</span>Tools</div><div class="tools">
+<button class="tool active" data-mode="petal">🌸<br>Petal</button><button class="tool" data-mode="ring">◯<br>Circle</button><button class="tool" data-mode="dot">●<br>Dot</button><button class="tool" data-mode="star">✦<br>Shape</button><button class="tool" data-mode="leaf">🍃<br>Leaf</button><button class="tool" data-mode="fill">✚<br>Fill</button><button class="tool" data-mode="center">🌺<br>Center</button><button class="tool" data-mode="draw">✏️<br>Draw</button><button class="tool" data-mode="erase">⌫<br>Erase</button></div></div>
+<div class="sec"><div class="title"><span class="num">3</span>Brush Size <b id="sv">28px</b></div><input id="size" class="range" type="range" min="6" max="55" value="28"></div>
+<div class="sec"><div class="title"><span class="num">4</span>Colors</div><div class="colors" id="colors"></div></div>
+<div class="tip">🪔 <b>Tip:</b> Try alternating yellow, orange, white and pink layers for a traditional Onam look. Select ✏️ Draw to freely sketch petals and patterns. Turn on symmetry for perfectly balanced designs.</div>
+</aside>
+<main class="workspace"><div class="board"><canvas id="canvas" width="900" height="900"></canvas>
+<div class="controls"><b>⚙ View</b><label>Zoom <span id="zv">100%</span></label><input class="mini" id="zoom" type="range" min="80" max="125" value="100"><label>✨ Symmetry</label><input id="sym" type="checkbox" checked> On<label>⊞ Grid</label><input id="grid" type="checkbox"></div></div></main></div>
+<script>
+const c=document.getElementById('canvas'),x=c.getContext('2d'),pal=['#fffdf2','#ffd21f','#ff9417','#f15b2a','#ef477f','#a63d82','#7aa83b','#4f8c3a','#8d4bb2'];let color=pal[1],mode='petal',size=28,items=[],redoStack=[];
+const flowers=[['Thumba','#fffdf2'],['Poov',' #ffd21f'],['Chethi','#ff5a22'],['Pink','#ef477f'],['Mulla','#fffdf2'],['Kanak','#ffb313'],['Genda','#f07b18'],['Purple','#8d4bb2']];
+flowers.forEach(([n,col],i)=>{let b=document.createElement('button');b.className='flower'+(i===1?' active':'');b.innerHTML='<i style="--c:'+col+'"></i>'+n;b.onclick=()=>{document.querySelectorAll('.flower').forEach(q=>q.classList.remove('active'));b.classList.add('active');color=col.trim()};document.getElementById('flowers').appendChild(b)});
+pal.forEach(col=>{let b=document.createElement('button');b.className='swatch';b.style.background=col;b.onclick=()=>color=col;document.getElementById('colors').appendChild(b)});
+document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tool').forEach(q=>q.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode});
+document.getElementById('size').oninput=e=>{size=+e.target.value;document.getElementById('sv').textContent=size+'px'};
+document.getElementById('zoom').oninput=e=>{document.getElementById('zv').textContent=e.target.value+'%';c.style.transform='scale('+e.target.value/100+')'};
+function bg(){x.clearRect(0,0,900,900);x.fillStyle='#fffdf5';x.fillRect(0,0,900,900);x.save();x.translate(450,450);for(let r=55;r<440;r+=52){x.strokeStyle='#ead8ad';x.lineWidth=2;x.beginPath();x.arc(0,0,r,0,Math.PI*2);x.stroke()}if(document.getElementById('grid').checked){x.strokeStyle='#ead8ad';for(let a=0;a<Math.PI;a+=Math.PI/12){x.beginPath();x.moveTo(0,0);x.lineTo(450*Math.cos(a),450*Math.sin(a));x.stroke()}}x.restore();x.strokeStyle='#d4b36b';x.lineWidth=6;x.beginPath();x.arc(450,450,432,0,Math.PI*2);x.stroke()}
+function petal(px,py,r,a,col){x.save();x.translate(px,py);x.rotate(a);x.fillStyle=col;for(let i=0;i<10;i++){x.rotate(Math.PI/5);x.beginPath();x.ellipse(0,-r*.7,r*.3,r*.7,0,0,Math.PI*2);x.fill()}x.restore()}
+function draw(){bg();items.forEach(o=>{if(o.t==='ring'){x.strokeStyle=o.col;x.lineWidth=o.r;x.beginPath();x.arc(o.x,o.y,o.R,0,Math.PI*2);x.stroke()}else if(o.t==='petal')petal(o.x,o.y,o.r,o.a,o.col);else if(o.t==='dot'){x.fillStyle=o.col;x.beginPath();x.arc(o.x,o.y,o.r,0,7);x.fill()}else if(o.t==='leaf'){x.fillStyle=o.col;x.save();x.translate(o.x,o.y);x.rotate(o.a);x.beginPath();x.ellipse(0,-o.r/2,o.r/3,o.r/2,0,0,7);x.fill();x.restore()}else if(o.t==='star'){x.fillStyle=o.col;x.beginPath();for(let i=0;i<16;i++){let a=i*Math.PI/8-Math.PI/2,r=i%2?o.r*.45:o.r;x.lineTo(o.x+Math.cos(a)*r,o.y+Math.sin(a)*r)}x.closePath();x.fill()}})}
+function add(o){items.push(o);redoStack=[];draw()}
+let drawing=false,lastX=0,lastY=0;
+function canvasPoint(e){let b=c.getBoundingClientRect();return {x:(e.clientX-b.left)*900/b.width,y:(e.clientY-b.top)*900/b.height}}
+c.addEventListener('pointerdown',e=>{let p=canvasPoint(e);if(mode==='draw'){drawing=true;lastX=p.x;lastY=p.y;x.save();x.strokeStyle=color;x.lineWidth=size/2;x.lineCap='round';x.lineJoin='round';x.beginPath();x.moveTo(lastX,lastY);x.lineTo(lastX+0.1,lastY+0.1);x.stroke();x.restore();return}let b=c.getBoundingClientRect(),px=p.x,py=p.y;if(mode==='erase'){items.pop();draw();return}if(mode==='ring')add({t:'ring',x:450,y:450,R:70+Math.random()*300,r:size,col:color});else if(mode==='dot')add({t:'dot',x:px,y:py,r:size/2,col:color});else if(mode==='leaf')add({t:'leaf',x:px,y:py,r:size*2,a:Math.random()*7,col:color});else if(mode==='star')add({t:'star',x:px,y:py,r:size*2,col:color});else if(mode==='fill'){x.fillStyle=color;x.beginPath();x.arc(px,py,size*1.8,0,7);x.fill();}else if(mode==='center')add({t:'petal',x:450,y:450,r:size*1.7,a:0,col:color});else {add({t:'petal',x:px,y:py,r:size,a:Math.random()*7,col:color});if(document.getElementById('sym').checked){for(let i=1;i<12;i++)add({t:'petal',x:450+(px-450)*Math.cos(i*Math.PI/6)-(py-450)*Math.sin(i*Math.PI/6),y:450+(px-450)*Math.sin(i*Math.PI/6)+(py-450)*Math.cos(i*Math.PI/6),r:size,a:Math.random()*7,col:color})}}});
+c.addEventListener('pointermove',e=>{if(!drawing)return;let p=canvasPoint(e);x.save();x.strokeStyle=color;x.lineWidth=size/2;x.lineCap='round';x.lineJoin='round';x.beginPath();x.moveTo(lastX,lastY);x.lineTo(p.x,p.y);x.stroke();x.restore();lastX=p.x;lastY=p.y});
+c.addEventListener('pointerup',()=>{drawing=false});
+c.addEventListener('pointerleave',()=>{drawing=false});
+function undo(){if(items.length){redoStack.push(items.pop());draw()}}function redo(){if(redoStack.length){items.push(redoStack.pop());draw()}}function clearAll(){items=[];redoStack=[];draw()}
+function template(){clearAll();[['#ff9417',410,30],['#fffdf2',350,25],['#ffd21f',290,25],['#ef477f',220,24],['#8d4bb2',150,22],['#ff9417',85,20]].forEach(q=>{color=q[0];add({t:'ring',x:450,y:450,R:q[1],r:q[2],col:q[0]})});color='#ef477f';add({t:'petal',x:450,y:450,r:35,a:0,col:color})}
+function surprise(){clearAll();let old=color;pal.slice(1,7).forEach((col,i)=>{color=col;add({t:'ring',x:450,y:450,R:70+i*62,r:15,col:col})});color=old;for(let i=0;i<4;i++){let a=i*Math.PI/2;add({t:'petal',x:450+Math.cos(a)*170,y:450+Math.sin(a)*170,r:24,a:a,col:old})}}
+function save(){let a=document.createElement('a');a.download='my-pookalam.png';a.href=c.toDataURL('image/png');a.click()}template();
+</script></body></html>
